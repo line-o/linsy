@@ -1,44 +1,49 @@
 xquery version "3.1";
 
-import module namespace linsy-read = "//line-o.de/ns/linsy/read" at "read.xqm";
+import module namespace linsy-read = "//line-o.de/ns/linsy/read" at "content/read.xqm";
 
-(
-    <system iterations="2" axiom="0">
-        <grammar>
-            <symbol match="1">11</symbol>
-            <symbol match="0">1[0]0</symbol>
-            <terminal match="[" />
-            <terminal match="]" />
-        </grammar>
-    </system>
-,
-    <system iterations="2" axiom="0" seed="1">
-        <grammar type="stochastic">
-            <symbol match="1">11</symbol>
-            <symbol match="0">
-                <option probability="0.475">1[0]0</option>
-                <option probability="0.475">11[0]0</option>
-                <option probability="0.05">0</option>
-            </symbol>
-            <terminal match="[" />
-            <terminal match="]" />
-        </grammar>
-    </system>
-,
-    <system iterations="2" axiom="0">
-        <grammar type="stochastic">
-            <symbol match="1">
-                <option probability="0.85">11</option>
-                <option probability="0.15">1</option>
-            </symbol>
-            <symbol match="0">
-                <option probability="0.475">1[0]0</option>
-                <option probability="0.475">11[0]0</option>
-                <option probability="0.05">0</option>
-            </symbol>
-            <terminal match="[" />
-            <terminal match="]" />
-        </grammar>
-    </system>
-)
-! linsy-read:system(.)
+declare option exist:serialize "method=html5 media-type=text/html";
+
+(:
+declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+
+declare option output:method "html5";
+declare option output:version "5";
+declare option output:mime-type "text/html";
+:)
+
+<html>
+    <head>
+        <style><![CDATA[
+            body { margin: 3em; }
+            article { margin-block: 2em; border-block-end: thin solid black; display: grid; grid-template-columns: 1fr 1fr; }
+            svg { max-height: 20em; }
+            code { width: 100%; }
+            .line { stroke: rgb(90,40,50);  stroke-width: 4; }
+        ]]></style>
+    </head>
+    <body>
+        <h1>Read System-Declarations</h1>
+        {
+        for $system in collection("/db/apps/linsy-test/systems")//system
+        return
+            <article>
+                <section>
+                    <h2>System</h2>
+                    <code><pre>
+                    {
+                        serialize(
+                            $system,
+                            map{"method": "xml", "indent": true()})
+                    }
+                    </pre></code>
+                </section>
+
+                <section>
+                    <h2>Result</h2>
+                    { linsy-read:system($system) }
+                </section>
+            </article>
+        }
+    </body>
+</html>

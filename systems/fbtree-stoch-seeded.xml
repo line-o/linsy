@@ -1,0 +1,21 @@
+<system iterations="5" seed="23">
+    <axiom>A</axiom>
+    <grammar type="stochastic">
+        <variable symbol="B">
+            <option weight="0.85">BB</option>
+            <option weight="0.15">B</option>
+        </variable>
+        <variable symbol="A">
+            <option weight="0.475">B[+A]-A</option>
+            <option weight="0.475">BB[+A]-A</option>
+            <option weight="0.05">A</option>
+        </variable>
+        <terminal symbol="[" />
+        <terminal symbol="]" />
+        <terminal symbol="+" />
+        <terminal symbol="-" />
+    </grammar>
+    <render viewBox="-240 0 480 480">
+        <initial y="480" x="0" v="12" o="90" a="45" />
+    </render>
+</system>

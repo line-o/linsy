@@ -1,6 +1,6 @@
 xquery version "3.1";
 
-import module namespace linsy = "//line-o.de/ns/linsy" at "linsy.xqm";
+import module namespace linsy = "//line-o.de/ns/linsy" at "content/linsy.xqm";
 
 declare variable $algae-axiom := "A";
 declare variable $algae-system := map {

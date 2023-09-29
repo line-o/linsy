@@ -1,0 +1,97 @@
+# Selection by weight
+
+Given three options a,b,c with a certain weight each which
+controls the probability this option will be selected with
+
+```xquery
+let $a := (
+    [1, "a"],
+    [2, "b"],
+    [1, "c"]
+)
+```
+
+The probability that `b` will be selected is twice as high
+as for `a` and `c`.
+
+Each weight has a probability of max probability (1.0) divided
+by the sum of all weights.
+
+The sum of all weights can be
+obtained by the following expression.
+
+```
+sum($a?1)
+```
+
+In the above example we get 4 as the sum. The factor to divide
+all given weights is therefore 0.25
+
+```
+let $factor := 1.0 div sum($a?1)
+```
+
+Multiply each weight by this factor
+
+let $prepared := $a ! [.?1 * $factor, .?2]
+
+For the example this yields
+
+```xquery
+(
+    [0.25, "a"],
+    [0.5, "b"],
+    [0.25, "c"]
+)
+```
+
+This way the weight table is fit to be used
+in a function that selects by probability using 
+a random number between 0 and 1.0
+
+```xquery
+declare
+function prob:select-by-p($options as array(*)+, $p as xs:double) as xs:string+ {
+    fold-left(
+        $options,
+        map {
+            "result": (),
+            "sum-p": 0,
+            "p": $p
+        },
+        prob:select#2
+    )
+    ?result
+};
+
+declare %private
+function prob:select($acc as map(*), $next as array(*)) as map(*) {
+    if (exists($acc?result))
+    then $acc (: pick first match, skip the rest :)
+    else
+        (: carry over sum of all previous probabilities :)
+        let $current-sum := $acc?sum-p + $next?1
+        let $match := if ($current-sum > $acc?p) then $next?2 else ()
+        return [ $match, $current-sum, $acc?p ]
+};
+```
+
+Would it be more performant to sort the options by weight?
+
+Considering an unsorted weight table heavily skewed towards
+selection of the last option.
+
+```xquery
+(
+    [1, "a"],
+    [1, "b"],
+    [99999, "c"],
+)
+```
+In this case the fold-left in `prob:select`
+will have to go through the two other calls without skipping
+for the majority of each calls.
+
+The actions performed when not skipping are relatively light
+weight, so I assume this will maybe only be interesting
+for longer sequences.

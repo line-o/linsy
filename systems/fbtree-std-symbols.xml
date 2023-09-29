@@ -1,0 +1,15 @@
+<system iterations="5">
+    <axiom>H@</axiom>
+    <grammar>
+        <variable symbol="B">BB</variable>
+        <variable symbol="@">B[+H@]-H@</variable>
+        <variable symbol="H">B</variable>
+        <terminal symbol="[" />
+        <terminal symbol="]" />
+        <terminal symbol="+" />
+        <terminal symbol="-" />
+    </grammar>
+    <render viewBox="-240 0 480 480">
+        <initial y="480" x="0" v="8" o="90" a="45" />
+    </render>
+</system>

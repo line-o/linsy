@@ -1,7 +1,7 @@
 xquery version "3.1";
 
-import module namespace linsy = "//line-o.de/ns/linsy" at "linsy.xqm";
-import module namespace render = "//line-o.de/ns/linsy/render" at "render.xqm";
+import module namespace linsy = "//line-o.de/ns/linsy" at "content/linsy.xqm";
+import module namespace render = "//line-o.de/ns/linsy/render" at "content/render.xqm";
 
 declare default element namespace "http://www.w3.org/2000/svg";
 
@@ -10,6 +10,7 @@ declare function local:get-integer ($parameter, $default) {
 };
 
 declare variable $local:iterations := local:get-integer("i", 8);
+declare variable $local:seed := local:get-integer("seed", ());
 
 declare variable $local:initial := map {
     "x": local:get-integer("x", 0), 
@@ -21,22 +22,13 @@ declare variable $local:initial := map {
 
 
 declare variable $fbtree-axiom := "0";
+
 declare variable $stochastic-fbtree-system := map {
     "1": ([0.85, "11"], [0.15, "1"]),
     "0": ([0.475, "1[0]0"], [0.475, "11[0]0"], [0.05, "0"]),
     "[": (),
     "]": ()
 };
-
-declare variable $det-fbtree-system := map {
-    "1": "11",
-    "0": "1[0]0",
-    "[": (),
-    "]": ()
-};
-
-(: declare variable $local:segments := 8;
-declare variable $local:orientation2rad := render:orientation2rad($local:segments); :)
 
 declare function local:leaf ($state as map(*)) as map(*) {
     let $leaf :=
@@ -47,18 +39,21 @@ declare function local:leaf ($state as map(*)) as map(*) {
         map:put($state, "elements", ($leaf, $state?elements))
 };
 
-declare function local:draw ($state as map(*), $next-symbol as xs:integer) { 
-    switch(codepoints-to-string($next-symbol))
+declare function local:draw ($state as map(*), $next-symbol as xs:string) as map(*) { 
+    switch($next-symbol)
         case "0" return render:line($state) => local:leaf()
         case "1" return render:line($state)
         case "[" return render:push-stack($state) => render:turn-left()
         case "]" return render:pop-stack($state) => render:turn-right()
-        default return error()
+        default return error((), "---- " || $next-symbol || " ----")
 };
 
-(: let $st := linsy:create-stochastic($stochastic-fbtree-system)
-let $r := linsy:iterate-stochastic($st, xs:integer(request:get-parameter("i", "8")), $fbtree-axiom, ()) :)
-let $r := linsy:deterministic($local:iterations, $fbtree-axiom, $det-fbtree-system)
+let $r := linsy:stochastic(
+    $local:iterations,
+    $fbtree-axiom,
+    $stochastic-fbtree-system,
+    $local:seed
+)
 
 return render:svg(
     $r,
@@ -77,10 +72,10 @@ return render:svg(
     (
         <rect x="-3000" y="0" width="6000" height="6000" fill="#eeeeee"/>,
         <text y="5150" x="-2800">{
-            for $i in (0 to (string-length($r) idiv 80))
+            for $i in (0 to (count($r) idiv 80))
             let $start := $i * 80
-            let $chunk := substring($r, $start + 1, 80)
-            return <tspan class="chunk" dy="132" x="-2800">{$chunk}</tspan>
+            let $chunk := subsequence($r, $start + 1, 80)
+            return <tspan class="chunk" dy="132" x="-2800">{string-join($chunk, "")}</tspan>
         }</text>,
         <text class="a" y="220" x="-2800">a = { $local:initial?a }</text>,
         <line x1="0" x2="0" y1="0" y2="6000" class="axis"/>,

@@ -15,7 +15,8 @@ declare variable $render:default-initial-position := map {
     "x": 0, "y": 0, (: the root of the coordinate system :)
     "o": 0, (: orientation in degrees (or segments) :)
     "v": 1, (: velocity in coordinate units :)
-    "a": 45 (: angle in degrees :)
+    "a": 45 (: angle in degrees :),
+    "s": 1  (: speed increase :)
 };
 
 (:~
@@ -37,7 +38,7 @@ declare function render:circle ($state) {
         map:put($state, "elements", ($leaf, $state?elements))
 };
 
-declare %private function render:next-pos($position as map(*)) as map(*) {
+declare function render:next-pos($position as map(*)) as map(*) {
     let $radians := $position?o * $render:one-deg
 
     return map {
@@ -45,7 +46,8 @@ declare %private function render:next-pos($position as map(*)) as map(*) {
         "y": $position?y - $position?v * math:sin($radians),
         "o": $position?o,
         "v": $position?v,
-        "a": $position?a
+        "a": $position?a,
+        "s": $position?s
     }
 };
 
@@ -110,7 +112,7 @@ declare function render:turn-right ($state as map(*)) as map(*) {
 
 declare function render:increase-velocity ($state as map(*)) as map(*) {
     map {
-        "position": map:put($state?position, "v", ($state?position?v + 1)),
+        "position": map:put($state?position, "v", ($state?position?v + $state?position?s)),
         "stack": $state?stack,
         "elements": $state?elements
     }
@@ -118,7 +120,7 @@ declare function render:increase-velocity ($state as map(*)) as map(*) {
 
 declare function render:decrease-velocity ($state as map(*)) as map(*) {
     map {
-        "position": map:put($state?position, "v", ($state?position?v - 1)),
+        "position": map:put($state?position, "v", ($state?position?v - $state?position?s)),
         "stack": $state?stack,
         "elements": $state?elements
     }
@@ -129,11 +131,12 @@ declare function render:decrease-velocity ($state as map(*)) as map(*) {
  : added: "<" and ">" to modify velocity
  :)
 declare function render:symbol ($state as map(*), $next-symbol as xs:integer) as map(*) { 
-    switch(codepoints-to-string($next-symbol))
+    switch($next-symbol)
         case "A" case "B" case "C" case "D" case "E" case "F"
             return render:line($state)
         case "G" case "H" case "I" case "J" case "K" case "L"
             return render:move($state)
+        case "@" return render:move($state)=>render:circle()
         case "-" return render:turn-left($state)
         case "+" return render:turn-right($state)
         case "[" return render:push-stack($state)
@@ -143,13 +146,13 @@ declare function render:symbol ($state as map(*), $next-symbol as xs:integer) as
         default return error()
 };
 
-declare function render:system ($system-result as xs:string, $initial-position as map(*)) as element()* {
+declare function render:system ($system-result as xs:string+, $initial-position as map(*)) as element()* {
     render:system($system-result, $initial-position, ())
 };
 
-declare function render:system ($system-result as xs:string, $initial-position as map(*), $draw-function as (function(map(*), xs:integer) as map(*))?) as element()* {
+declare function render:system ($system-result as xs:string+, $initial-position as map(*)?, $draw-function as (function(map(*), xs:integer) as map(*))?) as element()* {
     fold-left(
-        string-to-codepoints($system-result),
+        $system-result,
         map{
             "stack":(), "elements":(), 
             "position": map:merge(( $initial-position, $render:default-initial-position ), map{"duplicates":"use-first"})
