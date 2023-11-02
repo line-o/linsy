@@ -52,6 +52,7 @@ declare variable $local:style := text {
 
 declare variable $fbtree-axiom := "0";
 declare variable $det-fbtree-system := map {
+    "0": "1[0]0",
     "1": "2",
     "2": "3",
     "3": "4",
@@ -66,8 +67,8 @@ declare variable $det-fbtree-system := map {
     "c": "d",
     "d": "e",
     "e": "f",
-    "0": "10]0",
-    "]": ()
+    "]": (),
+    "[": ()
 };
 
 (: declare variable $local:segments := 8;
@@ -110,23 +111,24 @@ declare function local:line ($state as map(*), $age as xs:integer) as map(*) {
 
 declare function local:draw ($state as map(*), $next-symbol as xs:string) { 
     switch($next-symbol)
-        case "0" return render:line($state) => local:leaf()
-        case "]" return render:pop-stack($state) => render:turn-right()
-        case "1" return local:line($state, 0) => render:push-stack() => render:turn-left()
-        case "2" return local:line($state, 1) => render:push-stack() => render:turn-left()
-        case "3" return local:line($state, 2) => render:push-stack() => render:turn-left()
-        case "4" return local:line($state, 3) => render:push-stack() => render:turn-left()
-        case "5" return local:line($state, 4) => render:push-stack() => render:turn-left()
-        case "6" return local:line($state, 5) => render:push-stack() => render:turn-left()
-        case "7" return local:line($state, 6) => render:push-stack() => render:turn-left()
-        case "8" return local:line($state, 7) => render:push-stack() => render:turn-left()
-        case "9" return local:line($state, 8) => render:push-stack() => render:turn-left()
-        case "a" return local:line($state, 9) => render:push-stack() => render:turn-left()
-        case "b" return local:line($state, 10) => render:push-stack() => render:turn-left()
-        case "c" return local:line($state, 11) => render:push-stack() => render:turn-left()
-        case "d" return local:line($state, 12) => render:push-stack() => render:turn-left()
-        case "e" return local:line($state, 13) => render:push-stack() => render:turn-left()
-        case "f" return local:line($state, 14) => render:push-stack() => render:turn-left()
+        case "0" return $state => local:line(0) => local:leaf()
+        case "1" return $state => local:line(0)
+        case "2" return $state => local:line(1)
+        case "3" return $state => local:line(2)
+        case "4" return $state => local:line(3)
+        case "5" return $state => local:line(4)
+        case "6" return $state => local:line(5)
+        case "7" return $state => local:line(6)
+        case "8" return $state => local:line(7)
+        case "9" return $state => local:line(8)
+        case "a" return $state => local:line(9)
+        case "b" return $state => local:line(10)
+        case "c" return $state => local:line(11)
+        case "d" return $state => local:line(12)
+        case "e" return $state => local:line(13)
+        case "f" return $state => local:line(14)
+        case "[" return $state => render:pop-stack() => render:turn-right()
+        case "]" return $state => render:push-stack() => render:turn-left()
         default return error((), "---- " || $next-symbol || " ----")
 };
 

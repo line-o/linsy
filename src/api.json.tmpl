@@ -1,0 +1,373 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "version": "1.1.0",
+        "title": "linsy API",
+        "description": "The API to interact with linsy"
+    },
+    "servers": [
+        {
+            "url": "/exist/apps/@target@",
+            "description": ""
+        }
+    ],
+    "tags": [
+        {
+            "name": "render",
+            "description": "Rendering endpoints"
+        },
+        {
+            "name": "auth",
+            "description": "Authentication endpoints"
+        }
+    ],
+    "security": [
+        {
+            "cookieAuth": []
+        },
+        {
+            "basicAuth": []
+        }
+    ],
+    "components": {
+        "securitySchemes": {
+            "basicAuth": {
+                "type": "http",
+                "scheme": "basic"
+            },
+            "cookieAuth": {
+                "type": "apiKey",
+                "name": "linsy.com.login",
+                "in": "cookie"
+            }
+        }
+    },
+    "paths": {
+        "/logout": {
+            "get": {
+                "summary": "User Logout",
+                "description": "End session of the current user",
+                "operationId": "auth:logout",
+                "tags": [
+                    "auth"
+                ],
+                "parameters": [
+                    {
+                        "name": "logout",
+                        "in": "query",
+                        "description": "Set to some value to log out the current user",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "301": {
+                        "description": "Redirect with the logout parameter set.",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized"
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "summary": "User Login",
+                "description": "Start an authenticated session for the given user",
+                "tags": [
+                    "auth"
+                ],
+                "operationId": "auth:login",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "user"
+                                ],
+                                "properties": {
+                                    "user": {
+                                        "description": "Name of the user",
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    }
+                                }
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "user"
+                                ],
+                                "properties": {
+                                    "user": {
+                                        "description": "Name of the user",
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "user": {
+                                            "type": "string"
+                                        },
+                                        "groups": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "dba": {
+                                            "type": "boolean"
+                                        },
+                                        "domain": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Wrong user or password"
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ]
+            }
+        },
+        "/systems": {
+            "get": {
+                "description": "load all available systems",
+                "operationId": "api:list-systems",
+                "tags": [],
+                "responses": {
+                    "200": {
+                        "description": "list of all available systems",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": { "type": "string" }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/systems/{id}": {
+            "get": {
+                "description": "Load a specific system with $id",
+                "operationId": "api:load-system",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "unique ID of the system",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Rendered result",
+                        "content": {
+                            "application/xml": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "system": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "System was not found",
+                        "content": {
+                            "application/xml": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "save a new system with $id",
+                "operationId": "api:save-system",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "unique ID of the system",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/xml": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "system": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "System was saved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "System could not be saved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/render": {
+            "post": {
+                "description": "Render system XML in body",
+                "summary": "Render system XML in body",
+                "operationId": "api:render",
+                "tags": [
+                    "render"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/xml": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "system": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Rendered result",
+                        "content": {
+                            "image/svg+xml": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/xml": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/xml": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

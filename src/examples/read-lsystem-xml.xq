@@ -4,6 +4,8 @@ import module namespace linsy-read = "//line-o.de/ns/linsy/read" at "content/rea
 
 declare option exist:serialize "method=html5 media-type=text/html";
 
+declare variable $systems := collection("/db/apps/linsy/systems")//system;
+
 (:
 declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
 
@@ -25,7 +27,7 @@ declare option output:mime-type "text/html";
     <body>
         <h1>Read System-Declarations</h1>
         {
-        for $system in collection("/db/apps/linsy-test/systems")//system
+        for $system in $systems
         return
             <article>
                 <section>

@@ -1,0 +1,21 @@
+<system iterations="5">
+    <axiom>A</axiom>
+    <grammar type="stochastic">
+        <variable symbol="F">
+            <option weight="95">FF</option>
+            <option weight="5">FFF</option>
+        </variable>
+        <variable symbol="A">
+            <option weight="75">F+[[A]-A]-F[-FA]+A</option>
+            <option weight="25">F-F[-FA]+[[A]-A]+A</option>
+        </variable>
+        <terminal symbol="+" />
+        <terminal symbol="-" />
+        <terminal symbol="[" />
+        <terminal symbol="]" />
+    </grammar>
+    <render viewBox="0 0 200 200">
+        <state x="150" y="200" orientation="100"
+     velocity="2" angle="25" color="rgba(10,120,10,.3)" />
+    </render>
+</system>

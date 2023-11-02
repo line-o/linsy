@@ -15,8 +15,9 @@ declare variable $render:default-initial-position := map {
     "x": 0, "y": 0, (: the root of the coordinate system :)
     "o": 0, (: orientation in degrees (or segments) :)
     "v": 1, (: velocity in coordinate units :)
-    "a": 45 (: angle in degrees :),
-    "s": 1  (: speed increase :)
+    "a": 45, (: angle in degrees :)
+    "s": 1,  (: speed increase :)
+    "c": ()
 };
 
 (:~
@@ -30,9 +31,13 @@ declare function render:orientation2rad ($amount as xs:integer) {
 };
 
 declare function render:circle ($state) {
-    let $leaf :=
-        <circle class="circle" r="{$state?position?v}"
-            cx="{$state?position?x}" cy="{$state?position?y}"/>
+    let $leaf := element circle {
+        attribute class { "circle" },
+        attribute r { $state?position?v },
+        attribute cx { $state?position?x },
+        attribute cy { $state?position?y },
+        if ($state?position?c) then attribute fill {$state?position?c} else ()
+    }
 
     return
         map:put($state, "elements", ($leaf, $state?elements))
@@ -47,14 +52,16 @@ declare function render:next-pos($position as map(*)) as map(*) {
         "o": $position?o,
         "v": $position?v,
         "a": $position?a,
-        "s": $position?s
+        "s": $position?s,
+        "c": $position?c
     }
 };
 
 declare function render:line-from-to ($p1 as map(*), $p2 as map(*)) as element(line) {
     <line class="line"
         x1="{ $p1?x }" x2="{ $p2?x }"
-        y1="{ $p1?y }" y2="{ $p2?y }" />
+        y1="{ $p1?y }" y2="{ $p2?y }"
+        stroke="{$p2?c}" stroke-width="{math:sqrt($p1?v)}"/>
 };
 
 declare function render:move ($state as map(*)) as map(*) {
@@ -112,7 +119,7 @@ declare function render:turn-right ($state as map(*)) as map(*) {
 
 declare function render:increase-velocity ($state as map(*)) as map(*) {
     map {
-        "position": map:put($state?position, "v", ($state?position?v + $state?position?s)),
+        "position": map:put($state?position, "v", ($state?position?v * $state?position?s)),
         "stack": $state?stack,
         "elements": $state?elements
     }
@@ -120,7 +127,7 @@ declare function render:increase-velocity ($state as map(*)) as map(*) {
 
 declare function render:decrease-velocity ($state as map(*)) as map(*) {
     map {
-        "position": map:put($state?position, "v", ($state?position?v - $state?position?s)),
+        "position": map:put($state?position, "v", ($state?position?v div $state?position?s)),
         "stack": $state?stack,
         "elements": $state?elements
     }
@@ -143,7 +150,7 @@ declare function render:symbol ($state as map(*), $next-symbol as xs:integer) as
         case "]" return render:pop-stack($state)
         case "<" return render:increase-velocity($state)
         case ">" return render:decrease-velocity($state)
-        default return error()
+        default return error(xs:QName("linsy:unknown-symbol"), $next-symbol)
 };
 
 declare function render:system ($system-result as xs:string+, $initial-position as map(*)) as element()* {
@@ -155,15 +162,19 @@ declare function render:system ($system-result as xs:string+, $initial-position 
         $system-result,
         map{
             "stack":(), "elements":(), 
-            "position": map:merge(( $initial-position, $render:default-initial-position ), map{"duplicates":"use-first"})
+            "position": map:merge(( $initial-position, $render:default-initial-position ), map{"duplicates": "use-first"})
         },
         ($draw-function, render:symbol#2)[1]
     )?elements
 };
 
 declare function render:svg ($result, $initial, $draw, $view-box, $style as text()?, $background as element()*) as element(svg) {
+    render:svg($result, $initial, $draw, $view-box, (), <style>{ $style }</style>, $background)
+};
+
+declare function render:svg ($result, $initial, $draw, $view-box, $defs as element()?, $style as element()?, $background as element()*) as element(svg) {
     <svg viewBox="{$view-box}" width="100%" height="100%">
-        <style>{ $style }</style>
+        { $defs, $style }
         <g id="background">{ $background }</g>
         <g id="system">{ render:system($result, $initial, $draw) }</g>
     </svg>

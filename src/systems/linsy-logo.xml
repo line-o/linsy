@@ -1,0 +1,23 @@
+<system>
+    <axiom>&gt;&gt;&gt;B&lt;&lt;&lt;+A</axiom>
+    <grammar>
+        <variable symbol="A">A-&gt;A</variable>
+        <terminal symbol="B"/>
+        <terminal symbol="-"/>
+        <terminal symbol="+"/>
+        <terminal symbol="&lt;"/>
+        <terminal symbol="&gt;"/>
+    </grammar>
+    <render viewBox="0 0 200 200">
+        <state x="42" y="30" velocity="144" acceleration="1.75" orientation="2" angle="96" color="#005558"/>
+        <defs>
+            <linearGradient id="a" x1="89.22" x2="115.445" y1="0" y2="200" gradientUnits="userSpaceOnUse">
+              <stop offset="0" style="stop-color:#d4f38b;stop-opacity:.7491166"/>
+              <stop offset="1" style="stop-color:#b4ecc2;stop-opacity:.97173142"/>
+            </linearGradient>
+        </defs>
+        <background>
+           <rect width="191.875" height="191.875" x="4.063" y="4.063" ry="46.068" style="fill:url(#a);stroke:#616161;stroke-width:8.12511;stroke-opacity:.11142061;fill-opacity:1"/>
+        </background>
+    </render>
+</system>

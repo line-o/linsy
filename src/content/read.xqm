@@ -37,19 +37,25 @@ declare function read:grammar($grammar-declaration as element(grammar)) {
 
 declare function read:render ($result as xs:string+, $render as element(render)) as element(svg) {
     let $viewBox := $render/@viewBox/string()
-    let $initial := map {
-        "y": $render/initial/@y/number(),
-        "x": $render/initial/@x/number(),
-        "v": $render/initial/@v/number(),
-        "o": $render/initial/@o/number(),
-        "a": $render/initial/@a/number()
+    let $state := map {
+        "y": ($render/state/@y/number(), ())[1],
+        "x": ($render/state/@x/number(), ())[1],
+        "v": ($render/state/@velocity/number(), ())[1],
+        "o": ($render/state/@orientation/number(), ())[1],
+        "a": ($render/state/@angle/number(), ())[1],
+        "s": ($render/state/@acceleration/number(), ())[1],
+        "c": $render/state/@color/string()
     }
 
-    return render:svg($result, $initial, (), $viewBox, (), ())
+    return render:svg($result, $state, (), $viewBox, $render/defs, $render/style, $render/background/element())
 };
 
 declare function read:system($system-declaration as element(system)) as element() {
-    let $iterations := xs:integer($system-declaration/@iterations)
+    let $iterations :=
+        if (exists($system-declaration/@iterations))
+        then xs:integer($system-declaration/@iterations)
+        else 3
+
     let $axiom := $system-declaration/axiom/string()
 
     let $grammar := $system-declaration/grammar

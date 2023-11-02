@@ -16,6 +16,6 @@
         <terminal symbol="-" />
     </grammar>
     <render viewBox="-240 0 480 480">
-        <initial y="480" x="0" v="12" o="90" a="45" />
+        <state x="0" y="480" velocity="12" orientation="90" angle="45" color="black"/>
     </render>
 </system>

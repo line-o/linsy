@@ -1,0 +1,20 @@
+<system>
+    <axiom>A</axiom>
+    <grammar type="stochastic">
+        <variable symbol="F">
+            <option>FF</option>
+            <option>FFF</option>
+        </variable>
+        <variable symbol="A">
+            <option>F+[[A]-A]-F[-FA]+A</option>
+            <option>F-F[-FA]+[[A]-A]+A</option>
+        </variable>
+        <terminal symbol="+"/>
+        <terminal symbol="-"/>
+        <terminal symbol="["/>
+        <terminal symbol="]"/>
+    </grammar>
+    <render>
+        <state x="0" y="500" orientation="0" velocity="24" angle="25" color="rebeccapurple" />
+    </render>
+</system>

@@ -1,7 +1,7 @@
 xquery version "3.1";
 
-import module namespace linsy = "//line-o.de/ns/linsy" at "content/linsy.xqm";
-import module namespace render = "//line-o.de/ns/linsy/render" at "content/render.xqm";
+import module namespace linsy = "//line-o.de/ns/linsy" at "../content/linsy.xqm";
+import module namespace render = "//line-o.de/ns/linsy/render" at "../content/render.xqm";
 
 declare default element namespace "http://www.w3.org/2000/svg";
 
@@ -9,13 +9,9 @@ declare variable $local:style := text {
 "
 .leaf { fill: green; }
 .axis { stroke: red; stroke-width: 0; }
-.line { stroke: black; stroke-width: 4; }
-.chunk { font: bold 9em monospace; fill: burlywood; }
+.line { stroke: black; stroke-width: 8; }
+.chunk { font: bold 9em monospace; fill: #bb7711; }
 .a { font: 12em monospace; fill: brown; }
-#bg { fill: url(#sky); }
-.stop1 { stop-color: blue; stop-opacity: 0.25; }
-.stop2 { stop-color: white; stop-opacity: 0; }
-.stop3 { stop-color: lightgrey; stop-opacity: 0.25; }
 "
 };
 
@@ -74,19 +70,19 @@ declare function local:render ($r) {
         (
             <defs>
                 <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1">
-                    <stop class="stop1" offset="0%" />
-                    <stop class="stop2" offset="75%" />
-                    <stop class="stop3" offset="100%" />
+                    <stop class="stop1" offset="0%" stop-color="blue" stop-opacity="0.25" />
+                    <stop class="stop2" offset="75%" stop-color="burlywood" stop-opacity="0" />
+                    <stop class="stop3" offset="100%" stop-color="burlywood" stop-opacity="0.25" />
                 </linearGradient>
             </defs>,
-            <rect id="bg" x="-3000" y="0" width="6000" height="6000" fill="#eeeeee"/>,
+            <rect id="bg" x="-3000" y="0" width="6000" height="6000" fill="url(#sky)" />,
             <text y="5150" x="-2800">{
                 for $i in (0 to (count($r) idiv 80))
                 let $start := $i * 80
                 let $chunk := subsequence($r, $start + 1, 80)
                 return <tspan class="chunk" dy="132" x="-2800">{string-join($chunk, "")}</tspan>
             }</text>,
-            <text class="a" y="220" x="-2800">a = { $local:initial?a }</text>,
+            <text class="a" y="240" x="-2800">a = { $local:initial?a }</text>,
             <line x1="0" x2="0" y1="0" y2="6000" class="axis"/>,
             <line x1="-3000" x2="3000" y1="3000" y2="3000" class="axis"/>
         )

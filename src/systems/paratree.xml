@@ -1,0 +1,20 @@
+<!-- 
+ para parametric binary tree
+ &gt; and &lt; will scale following symbols
+-->
+<system iterations="7">
+    <axiom>A@</axiom>
+    <grammar>
+        <variable symbol="A">&lt;A&gt;</variable>
+        <variable symbol="@">&lt;A&gt;[+A&gt;@]-A&gt;@</variable>
+        <terminal symbol="&lt;"/>
+        <terminal symbol="&gt;"/>
+        <terminal symbol="["/>
+        <terminal symbol="]"/>
+        <terminal symbol="+"/>
+        <terminal symbol="-"/>
+    </grammar>
+    <render viewBox="0 0 800 800">
+        <state x="400" y="800" velocity="16" acceleration="1.4" angle="23" orientation="90" color="darkgreen"/>
+    </render>
+</system>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://expath.org/ns/pkg" name="@namespace@" abbrev="@target@" version="@version@" spec="1.0">
+    <title>@title@</title>
+    <dependency processor="http://exist-db.org" semver-min="5.5.0"/>
+    <dependency package="http://e-editiones.org/roaster" semver-min="1.8.1"/>
+
+    <xquery>
+        <namespace>//line-o.de/ns/linsy</namespace>
+        <file>lib/linsy.xqm</file>
+    </xquery>
+    <xquery>
+        <namespace>//line-o.de/ns/linsy/render</namespace>
+        <file>lib/render.xqm</file>
+    </xquery>
+    <xquery>
+        <namespace>//line-o.de/ns/linsy/read</namespace>
+        <file>lib/read.xqm</file>
+    </xquery>
+</package>

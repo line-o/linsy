@@ -1,4 +1,4 @@
-<system iterations="3">
+<system>
     <axiom>A</axiom>
     <grammar type="stochastic">
         <variable symbol="B">BB</variable>
@@ -7,12 +7,12 @@
             <option weight="10">BB[+A]-A</option>
             <option>A</option>
         </variable>
-        <terminal symbol="[" />
-        <terminal symbol="]" />
-        <terminal symbol="+" />
-        <terminal symbol="-" />
+        <terminal symbol="["/>
+        <terminal symbol="]"/>
+        <terminal symbol="+"/>
+        <terminal symbol="-"/>
     </grammar>
-    <render viewBox="-120 0 240 240">
-        <initial y="240" x="0" v="16" o="90" a="45" />
+    <render viewBox="0 0 240 240">
+        <state x="120" y="240" velocity="16" orientation="90" angle="45" color="black"/>
     </render>
 </system>

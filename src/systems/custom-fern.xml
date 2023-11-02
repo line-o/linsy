@@ -1,0 +1,19 @@
+<!--
+  derivative of the binary tree system
+  using only standard symbols  
+-->
+<system iterations="7">
+    <axiom>BA</axiom>
+    <grammar>
+        <variable symbol="A">B[+BA][BBA]-BA</variable>
+        <variable symbol="B">BB</variable>
+        <terminal symbol="[" />
+        <terminal symbol="]" />
+        <terminal symbol="+" />
+        <terminal symbol="-" />
+    </grammar>
+    <render viewBox="0 0 512 512">
+        <state x="256" y="512" color="darkred"
+            velocity="1" orientation="90" angle="33" />
+    </render>
+</system>

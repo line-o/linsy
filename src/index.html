@@ -1,0 +1,171 @@
+<!doctype html>
+<html>
+    <style>
+        html {
+            --min-height: calc(100vh - 2rem);
+        }
+        body {
+            display: grid;
+            grid-template-columns: 40% 60%;
+            margin: 1rem;
+            padding: 0;
+            box-sizing: content-box;
+            height: var(--min-height);
+            max-height: var(--min-height);
+            grid-column-gap: 1rem;
+            background-color: beige;
+        }
+        select {
+           display: inline-block;
+           width: 100%;
+           height: 2rem;
+           font-size: 2rem;
+        }
+        form {
+            align-content: start; 
+            box-sizing: content-box;
+            min-height: var(--min-height);
+        }
+        textarea {
+            min-height: 60vh;
+            width: 100%;
+            font-family: monospace;
+            font-size: 1rem;
+            overflow: scroll;
+            resize: none;
+            box-sizing: border-box;
+        }
+        button {
+            background: blue;
+            color: white;
+            display: inline-block;
+            height: 2rem;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 1rem;
+            text-transform: uppercase;
+            border: thin solid midnightblue;
+        }
+        #save-button {
+            background: darkolivegreen;
+            border-color: darkslategrey;
+        }
+        div {
+            margin:0;
+            padding:0;
+            box-sizing: content-box;
+            height: var(--min-height);
+            /* max-height: 100%; */
+        }
+    </style>
+    <body>
+        <form>
+            <select id="system-select"></select>
+            <textarea id="system-editor" wrap="off" placeholder="Enter L-system or select one from above"></textarea>
+            <button id="render-button" type="button">render</button>
+            <button id="save-button" type="button">save</button>
+        </form>
+        <div id="result"></div>
+        <script>
+            document.addEventListener("DOMContentLoaded", async (event) => {
+            const systemEditor = document.querySelector('#system-editor')
+            const systemSelect = document.querySelector('#system-select')
+            const renderButton = document.querySelector('#render-button')
+            const saveButton = document.querySelector('#save-button')
+            const result = document.querySelector('#result')
+
+            
+            // load options
+            async function loadOptions () {
+                try {
+                    systemSelect.innerHTML = '<option>-load an example-</option>'
+
+                    const systemListLoadResponse = await fetch("systems")
+                    if (!systemListLoadResponse.ok) {
+                        throw new Error("Network response was not OK");
+                    }
+                    const systemsList = await systemListLoadResponse.json()
+                    systemsList.forEach(system => {
+                        const optionText = document.createTextNode(system.id)
+                        const option = document.createElement('option')
+                        option.value = system.id
+                        option.appendChild(optionText)
+                        systemSelect.appendChild(option)
+                    })
+                } catch (e) {
+                    console.error(e)
+                }
+            }
+
+            await loadOptions()
+
+            const render = async event => {
+                try {
+                    const body = systemEditor.value
+                    const response = await fetch("render", {
+                        method: "post",
+                        headers,
+                        body
+                    })
+                    if (!response.ok) {
+                      throw new Error("Network response was not OK");
+                    }
+                    const responseText = await response.text()
+                    result.innerHTML = responseText
+                } catch (e) {
+                    console.error(e)
+                }
+            }
+            const save = async event => {
+                try {
+                    let id = prompt("Please enter an ID for your system");
+
+                    if (id === null || id === '') {
+                        console.error('id cannot be empty')
+                        return;
+                    }
+                    const body = systemEditor.value
+
+                    const response = await fetch(`systems/${id}`, {
+                        method: "put",
+                        headers,
+                        body
+                    })
+                    if (!response.ok) {
+                      throw new Error("Network response was not OK");
+                    }
+                    console.log(await response.json())
+                } catch (e) {
+                    console.error(e)
+                }
+            }
+
+            const headers = {
+                'Accept': 'impage/svg+xml,application/xml,text/plain',
+                'Content-Type': 'application/xml'
+            }
+
+            systemSelect.addEventListener('change', async event => {
+                try {
+                    systemEditor.value = ''
+                    const response = await fetch(`systems/${systemSelect.value}` , {
+                        method: "get",
+                        headers: { 'Accept': 'application/xml'}
+                    })
+                    if (!response.ok) {
+                      throw new Error("Network response was not OK");
+                    }
+                    const resptext = await response.text()
+                    systemEditor.value = resptext
+                } catch (e) {
+                    console.error(e)
+                }
+
+            })
+            renderButton.addEventListener('click', render)
+            saveButton.addEventListener('click', save)
+        })
+
+        </script>
+    </body>
+</html>

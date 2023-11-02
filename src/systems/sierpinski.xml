@@ -1,0 +1,20 @@
+<!-- 
+variables : F G
+constants : + −
+start  : F−F−F
+rules  : (F → F−G+F+G−F), (G → GG)
+angle  : 120°
+-->
+<system iterations="6">
+    <axiom>F-F-F</axiom>
+    <grammar>
+        <variable symbol="F">F-G+F+G-F</variable>
+        <variable symbol="G">GG</variable>
+        <terminal symbol="+"/>
+        <terminal symbol="-"/>
+    </grammar>
+    <render viewBox="0 0 512 512">
+        <style>.line {stroke-linecap: round; }</style>
+        <state x="12" y="500" velocity="8" orientation="15" angle="120" color="rgba(0,0,0,.75)"/>
+    </render>
+</system>
