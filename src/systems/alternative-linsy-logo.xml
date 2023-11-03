@@ -1,0 +1,29 @@
+<!-- 
+    - uses a custom draw function
+    - symbol A will draw the path with id 'l'
+ -->
+<system>
+    <axiom>A</axiom>
+    <grammar>
+        <variable symbol="A">A-&gt;A</variable>
+        <terminal symbol="B"/>
+        <terminal symbol="-"/>
+        <terminal symbol="+"/>
+        <terminal symbol="&lt;"/>
+        <terminal symbol="&gt;"/>
+    </grammar>
+    <render viewBox="0 0 200 200">
+        <state x="38" y="36" velocity="8" acceleration="1.75" orientation="350" angle="28" color="#005558"/>
+        <defs>
+            <path id="l" d="m 4.9080507,4.7822035 h 4.7822034 l -1.132627,12.4588975 6.4182199,-0.125847 .251695,1.258474 -10.6970335,-0.125847 z" stroke="rgba(0,0,0,.24)"/>
+            <linearGradient id="a" x1="89.22" x2="115.445" y1="0" y2="200" gradientUnits="userSpaceOnUse">
+              <stop offset="0" style="stop-color:#d4f38b;stop-opacity:.7491166"/>
+              <stop offset="1" style="stop-color:#b4ecc2;stop-opacity:.97173142"/>
+            </linearGradient>
+        </defs>
+        <background>
+           <rect width="191.875" height="191.875" x="4.063" y="4.063" ry="46.068" style="fill:url(#a);stroke:#616161;stroke-width:8.12511;stroke-opacity:.11142061;fill-opacity:1"/>
+        </background>
+        <draw ns="//line-o.de/ns/linsy/render/custom" location="/db/apps/linsy/examples/custom-draw-function.xqm" name="draw"/>
+    </render>
+</system>

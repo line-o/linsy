@@ -14,6 +14,20 @@ declare variable $read:type-map := map {
     }
 };
 
+declare function read:get-custom-draw-function ($draw as element(draw)) as function(*)? {
+    let $ns := $draw/@ns/string()
+    let $loc := $draw/@location/string()
+    let $name := $draw/@name/string()
+    let $qname := QName($ns, $name)
+    let $module := load-xquery-module($ns, map { "location-hints": $loc })
+    
+    let $reference := map:for-each($module?functions, function ($k, $v) {
+        if ($k = $qname) then $v?2 else ()
+    })
+    
+    return if (exists($reference)) then $reference else error()
+};
+
 declare function read:variable($variable-declaration as element(variable)) {
     if (exists($variable-declaration/option))
     then $variable-declaration/option ! ([
@@ -47,7 +61,12 @@ declare function read:render ($result as xs:string+, $render as element(render))
         "c": $render/state/@color/string()
     }
 
-    return render:svg($result, $state, (), $viewBox, $render/defs, $render/style, $render/background/element())
+    let $draw-function :=
+        if (exists($render/draw))
+        then read:get-custom-draw-function($render/draw)
+        else ()
+    
+    return render:svg($result, $state, $draw-function, $viewBox, $render/defs, $render/style, $render/background/element())
 };
 
 declare function read:system($system-declaration as element(system)) as element() {
