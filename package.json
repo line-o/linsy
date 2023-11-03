@@ -1,6 +1,6 @@
 {
   "name": "linsy",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "l-systems in xquery",
   "scripts": {
     "test": "dotenv gulp install:all",
