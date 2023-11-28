@@ -52,21 +52,25 @@ function installXar (packageFilename) {
 }
 
 function cleanDist (cb) {
-    del([distFolder], cb);
+    del([distFolder], cb)
 }
 exports['clean:dist'] = cleanDist
 
 function cleanLibrary (cb) {
-    del([buildFolder], cb);
+    del([buildFolder], cb)
 }
 exports['clean:library'] = cleanLibrary
 
 function cleanAll (cb) {
-    del([distFolder, buildFolder], cb);
+    del([distFolder, buildFolder], cb)
 }
 exports['clean:all'] = cleanAll
 
 exports.clean = cleanAll
+
+function cleanStaticBuild (cb) {
+    del(['static/content', 'static/systems'], cb)
+}
 
 /**
  * replace placeholders 
@@ -147,7 +151,7 @@ function buildStaticPage () {
     return src(['src/systems/*', 'src/content/*'], {base: 'src'})
         .pipe(dest(staticBuild))
 }
-exports.static = buildStaticPage
+exports.static = series(cleanStaticBuild, buildStaticPage)
 
 // main task for day to day development
 // package and install library
