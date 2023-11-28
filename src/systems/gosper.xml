@@ -1,0 +1,13 @@
+<system>
+ <axiom>A</axiom>
+ <grammar>
+   <variable symbol="A">A+BF++BF-FA--FAFA-BF+</variable>
+   <variable symbol="B">-FA+BFBF++BF+FA--FA-B</variable>
+   <terminal symbol="F"/>
+   <terminal symbol="+"/>
+   <terminal symbol="-"/>
+ </grammar>
+ <render viewBox="-100 -20 200 200">
+   <state x="0" y="0" velocity="4" orientation="0" angle="60" color="black"/>
+  </render>
+</system>

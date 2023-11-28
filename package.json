@@ -6,7 +6,8 @@
     "test": "dotenv gulp install:all",
     "build": "gulp build",
     "deploy": "dotenv gulp install",
-    "develop": "dotenv gulp"
+    "develop": "dotenv gulp",
+    "static": "gulp static"
   },
   "repository": {
     "type": "git",
@@ -39,5 +40,8 @@
   "overrides": {
     "chokidar": "$chokidar",
     "glob-stream": "$glob-stream"
+  },
+  "dependencies": {
+    "fontoxpath": "^3.30.2"
   }
 }

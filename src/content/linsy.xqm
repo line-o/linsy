@@ -134,15 +134,17 @@ declare function linsy:get-stochastic-replacements ($match as xs:string, $rule a
         $match : typeswitch($rule)
             case xs:string return
                 function($_) { linsy:split-string($rule) }
-            case empty-sequence() return
-                function($_) { $match }
+            (: case empty-sequence() return
+                function($_) { $match } :)
             case array(*)+ return
                 prob:select-by-p(
                     prob:prepare-options($rule, linsy:prep-rule#2),
                     ?
                 )
-            default return
-                error((), "Unsupported type for rule " || $rule)
+            default return 
+                if (empty($rule)) (: $match is a terminal :)
+                then function($_) { $match }
+                else error((), "Unsupported type for rule " || $rule)
     }
 };
 

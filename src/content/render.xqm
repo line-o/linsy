@@ -137,13 +137,13 @@ declare function render:decrease-velocity ($state as map(*)) as map(*) {
  : "standard" actions taken from inkscape's L-System renderer
  : added: "<" and ">" to modify velocity
  :)
-declare function render:symbol ($state as map(*), $next-symbol as xs:integer) as map(*) { 
+declare function render:symbol ($state as map(*), $next-symbol as xs:string) as map(*) { 
     switch($next-symbol)
         case "A" case "B" case "C" case "D" case "E" case "F"
             return render:line($state)
         case "G" case "H" case "I" case "J" case "K" case "L"
             return render:move($state)
-        case "@" return render:move($state)=>render:circle()
+        case "@" return render:move($state) => render:circle()
         case "-" return render:turn-left($state)
         case "+" return render:turn-right($state)
         case "[" return render:push-stack($state)
@@ -157,7 +157,7 @@ declare function render:system ($system-result as xs:string+, $initial-position 
     render:system($system-result, $initial-position, ())
 };
 
-declare function render:system ($system-result as xs:string+, $initial-position as map(*)?, $draw-function as (function(map(*), xs:integer) as map(*))?) as element()* {
+declare function render:system ($system-result as xs:string+, $initial-position as map(*)?, $draw-function as (function(map(*), xs:string) as map(*))?) as element()* {
     fold-left(
         $system-result,
         map{

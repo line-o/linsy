@@ -5,7 +5,7 @@ import module namespace linsy = "//line-o.de/ns/linsy" at "linsy.xqm";
 import module namespace render = "//line-o.de/ns/linsy/render" at "render.xqm";
 
 declare variable $read:type-map := map {
-    "deterministic": function ($iterations, $axiom, $system, $seed) {
+    "deterministic": function ($iterations, $axiom, $system, $_) {
         linsy:deterministic($iterations, $axiom, $system)
     },
     "stochastic": linsy:stochastic#4,
@@ -14,35 +14,56 @@ declare variable $read:type-map := map {
     }
 };
 
+declare function read:draw-function-from-module($qname as xs:QName, $draw as element(draw)) as function(*)? {
+    (: try { :)
+        let $import-options :=
+            if (exists($draw/@location))
+            then map { "location-hints" : $draw/@location/string() }
+            else map { }
+        let $load := function-lookup(xs:QName('fn:load-xquery-module'), 2)
+        let $module := $load($draw/@ns/string(), $import-options)
+        return 
+            if (
+                exists($module) and 
+                map:contains($module, "functions") and
+                map:contains($module?functions, $qname) and
+                map:contains($module?functions?($qname), 2)
+            ) then (
+                $module?functions?($qname)?2
+            ) else ()
+    (: } catch * {
+        ()
+    } :)
+};
+
 declare function read:get-custom-draw-function ($draw as element(draw)) as function(*)? {
-    let $ns := $draw/@ns/string()
-    let $loc := $draw/@location/string()
-    let $name := $draw/@name/string()
-    let $qname := QName($ns, $name)
-    let $module := load-xquery-module($ns, map { "location-hints": $loc })
+    let $qname := QName($draw/@ns/string(), $draw/@name/string())
+    let $lookup-reference := function-lookup($qname, 2)
+
+    let $reference :=
+        if (empty($lookup-reference))
+        then read:draw-function-from-module($qname, $draw)
+        else $lookup-reference
     
-    let $reference := map:for-each($module?functions, function ($k, $v) {
-        if ($k = $qname) then $v?2 else ()
-    })
-    
-    return if (exists($reference)) then $reference else error()
+    return
+        if (empty($reference))
+        then error((), "Function " || $qname || " not found")
+        else $reference
 };
 
 declare function read:variable($variable-declaration as element(variable)) {
     if (exists($variable-declaration/option))
-    then $variable-declaration/option ! ([
-        (./@weight/number(), 1)[1],
-        ./string()
-    ])
+    then $variable-declaration/option ! ([ (./@weight/number(), 1)[1], ./string() ])
     else $variable-declaration/string()
 };
 
-declare function read:grammar($grammar-declaration as element(grammar)) {
-    for-each($grammar-declaration/(variable|terminal), function ($e) {
+declare function read:grammar($grammar-declaration as element()) as map(*) {
+    let $uuu := ($grammar-declaration/variable, $grammar-declaration/terminal)
+    return for-each($uuu, function ($el as element()) {
         map {
-            $e/@symbol/string() :
-                typeswitch ($e)
-                case element(variable) return read:variable($e)
+            $el/@symbol/string() :
+                typeswitch ($el)
+                case element(variable) return read:variable($el)
                 default return ()
         }
     })
@@ -69,7 +90,7 @@ declare function read:render ($result as xs:string+, $render as element(render))
     return render:svg($result, $state, $draw-function, $viewBox, $render/defs, $render/style, $render/background/element())
 };
 
-declare function read:system($system-declaration as element(system)) as element() {
+declare function read:system($system-declaration as element(grammar)) as element() {
     let $iterations :=
         if (exists($system-declaration/@iterations))
         then xs:integer($system-declaration/@iterations)
@@ -89,9 +110,9 @@ declare function read:system($system-declaration as element(system)) as element(
 
     let $result :=
         if (empty($generator))
-        then error((), "unknown type " || $type, $system-declaration)
+        then error((), "unknown type " || $type)
         else if (empty($axiom))
-        then error((), "axiom must be set", $system-declaration)
+        then error((), "axiom must be set but is '" || $axiom || "'")
         else $generator($iterations, $axiom, $system, $seed)
 
     return

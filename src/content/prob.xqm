@@ -30,8 +30,8 @@ function prob:prepare-options (
     $options as array(*)+,
     $adjust as function(xs:double, array(*)) as array(*)
 ) as array(*)+ {
-    prob:adjust-weights($options?1)
-    => for-each-pair($options, $adjust)
+    for $adjusted-weight at $pos in prob:adjust-weights($options?1) 
+    return array:put($options[$pos], 1, $adjusted-weight)
 };
 
 (: ---- helper functions ---- :)

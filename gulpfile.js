@@ -25,6 +25,7 @@ const existClient = createClient(connectionOptions);
 
 const distFolder = 'dist'
 const buildFolder = 'build'
+const staticBuild = 'static'
 
 const package = {
     static: [
@@ -141,6 +142,12 @@ const watchAll = parallel(
     watchBuild
 )
 exports.watch = watchAll
+
+function buildStaticPage () {
+    return src(['src/systems/*', 'src/content/*'], {base: 'src'})
+        .pipe(dest(staticBuild))
+}
+exports.static = buildStaticPage
 
 // main task for day to day development
 // package and install library
